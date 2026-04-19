@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"lefree/go-todo/internal/handlers"
+	"lefree/go-todo/internal/repository"
 	"lefree/go-todo/internal/service"
 	"log/slog"
 
@@ -35,12 +36,14 @@ func main() {
 		}
 	})
 	logger := slog.Default()
-	taskService := service.NewTaskService(logger, db)
+	taskRepo := repository.NewTaskRepository(db, logger)
+	taskService := service.NewTaskService(logger, taskRepo)
 	handler := handlers.NewTaskHandler(logger, taskService)
 	e.GET("/", handler.GetAllTasks)
 	e.GET("/:id", handler.GetTaskById)
 	e.POST("/", handler.AddTask)
 	e.DELETE("/:id", handler.DeleteTaskById)
+	e.PATCH("/", handler.UpdateTask)
 
 	e.Start(":9091")
 }

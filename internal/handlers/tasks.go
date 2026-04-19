@@ -73,3 +73,19 @@ func (h *TaskHandler) DeleteTaskById(c *echo.Context) error {
 	}
 	return nil
 }
+
+func (h *TaskHandler) UpdateTask(c *echo.Context) error {
+	var task models.Task
+	if err := c.Bind(&task); err != nil {
+		c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	if task.ID == "" {
+		c.JSON(http.StatusBadRequest, map[string]string{"error": "Empty param Id"})
+	}
+	res, err := h.service.Patch(&task)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, res)
+	return nil
+}
